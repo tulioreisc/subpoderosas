@@ -496,39 +496,131 @@ kill(int pid)
   return -1;
 }
 
+
+// Retorna se a página apontada por pageTabEntry possui alguma posição de memória sendo utilizada
+uint temPosicaoUtilizada(pte_t *pageTabEntry) {
+    int i;
+    for (i = 0; i < NPTENTRIES; i++) {  // percorre todas as posições da Page Table
+        if ((pageTabEntry[i] & PTE_P) && (pageTabEntry[i] & PTE_U)) {
+              // verifica pra cada entrada da Page Table se as flags P (Present) e U (User) estão acionadas
+              // se estiverem acionadas, quer dizer que aquela página está sendo usada (retorna 1)
+            return 1;
+        }
+    }
+    return 0;
+}
+
 //PAGEBREAK: 36
 // Print a process listing to console.  For debugging.
 // Runs when user types ^P on console.
 // No lock to avoid wedging a stuck machine further.
-void
-procdump(void)
-{
-  static char *states[] = {
-  [UNUSED]    "unused",
-  [EMBRYO]    "embryo",
-  [SLEEPING]  "sleep ",
-  [RUNNABLE]  "runble",
-  [RUNNING]   "run   ",
-  [ZOMBIE]    "zombie"
-  };
-  int i;
-  struct proc *p;
-  char *state;
-  uint pc[10];
+///// FUNÇÃO QUE VAMOS ALTERAR PARA MODIFICAR O CTRL + P
+void procdump(void) {
+  // Estados que o processo pode estar 
+  static char *states[] = { [UNUSED]    "unused",
+                            [EMBRYO]    "embryo",
+                            [SLEEPING]  "sleep ",
+                            [RUNNABLE]  "runble",
+                            [RUNNING]   "run   ",
+                            [ZOMBIE]    "zombie" };
 
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+  int i;
+  struct proc *p;   // variável que vai ser salvo o endereço do processo
+  char *state;      // recebe o estado do processo
+  uint pc[10];      // vetor que guarda todos os endereços de retorno do stack frame do processo
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){ // NPROC = número máximo de processos que se pode ter
+                                                      // percorre a tabela de processos 
     if(p->state == UNUSED)
-      continue;
-    if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
-      state = states[p->state];
+      continue;     // passa para a próxima iteração; se não está sendo usado, não tem pq printar
+    if(p->state >= 0 && p->state < NELEM(states) && states[p->state])   // NELEM: verifica o número de elementos de um vetor de tamanho fixo
+                                                                        // verificando se é um estado válido para o processo
+      state = states[p->state];     // coloca em "state" o valor string do estado atual daquele processo
     else
-      state = "???";
-    cprintf("%d %s %s", p->pid, state, p->name);
-    if(p->state == SLEEPING){
-      getcallerpcs((uint*)p->context->ebp+2, pc);
-      for(i=0; i<10 && pc[i] != 0; i++)
-        cprintf(" %p", pc[i]);
+      state = "???";                // se ele não tem um estado (sempre tem), "state" recebe o valor string de "???"
+
+    cprintf("\nPID: %d, Estado: %s, Nome: %s;", p->pid, state, p->name);    // cprintf: serve para imprimir texto no console do xv6 (ao invés do meu terminal)
+                                                    // imprime sobre o processo: o PID, a string referente ao estado e o nome do processo
+                                                    // foi inserido um /n antes da impressão para melhorar a legibilidade
+    if(p->state == SLEEPING){   // se o processo tiver em estado de "SLEEPING",
+      getcallerpcs((uint*)p->context->ebp+2, pc);   // retorna todos os endereços de retorno do stack frame do processo, armazenando em pc
+      for(i=0; i<10 && pc[i] != 0; i++)   // a última posição é preenchida com 0, então se tiver um 0 ele para de imprimir
+        cprintf(" %p", pc[i]);      // imprime cada endereço de retorno (Qual a utilidade disso???)
     }
-    cprintf("\n");
+    cprintf("\n");    // pula linha para que o mesmo procedimento possa ser feito para o próximo processo 
+
+
+  
+    ///////////////////////////////////////////
+    ///////// ALTERAÇÕES REALIZADAS PARA TASK 1
+
+    // pte_t: tipo da page table entry
+    pte_t *pageDirEntryVir; // endereço virtual para o Page Directory de cada processo
+    pte_t *pageTabEntryFis; // endereço físico para uma Page Table
+    pte_t *pageTabEntryVir; // endereço virtual para uma Page Table
+    pte_t *ppn; // Page Number Físico
+    pte_t *vpn; // Page Number Virtual
+
+
+    pageDirEntryVir = p->pgdir; // pageDirEntry recebe o endereço virtual do Page Directory do processo atual
+                                // cada processo tem sua Page Directory
+
+    cprintf("----- MAIS INFO SOBRE O PROCESSO %d-----\n", p->pid); // imprime no xv6
+    cprintf("Page tables: \n");
+    //cprintf("    Memory location of page directory = %p\n", V2P(pageDirEntryVir));
+    cprintf("    Endereco fisico da Page Directory do processo em questao = %p\n", V2P(pageDirEntryVir));
+            // V2P converte o endereço virtual da Page Directory deste processo armazenado em pageDirEntry em um endereço físico
+            // esse endereço físico e referente ao local físico que está sendo armazenado a Page Directory do processo atual
+            // dentro dessa Page Directory, haverão várias entradas; cada entrada contém um endereço virtual que aponta para uma 
+            // outra tabela, que é uma de Page Table. Dessa forma, a Page Directory aponta para várias Page Tables.
+                // O que precisamos fazer é verificar quais páginas dessas Page Tables estão sendo usadas. 
+
+    for (int indiceDiretorio = 0; indiceDiretorio < NPDENTRIES; indiceDiretorio++) {  // NPDENTRIES é determinada em mmu.h
+                                                                                      // Page Directory é um vetor de tamanho NPDENTRIES
+      // esse loop corre todas as posições da Page Directory, onde o índice da posição estará na variável indiceDiretorio
+      // assim, é possível verificar para cada entrada da Page Directory qual é o endereço físico da Page Table correspondente
+      // sabendo qual o endereço físico da Page Table correspondente é possível varrer essa Page Table atrás de páginas sendo usadas
+
+
+      pageTabEntryFis = (pte_t*)PTE_ADDR(pageDirEntryVir[indiceDiretorio]);  // pega o endereço físico da Page Table apontada pora aquela
+                                                                          // entrada da Page Directory e armazena em pageTabEntryFis
+      pageTabEntryVir = P2V(pageTabEntryFis);   // converte o endereço físico da Page Table em um endereço virtual
+      ppn = (pte_t*)(PTE_ADDR(pageDirEntryVir[indiceDiretorio]) >> 12);   // PPN da instância de Page Table apontada pela entrada atual 
+                                                                          // da Page Directory (instância de índice [indiceDiretorio])
+
+      if ((pageDirEntryVir[indiceDiretorio] & PTE_P) && (pageDirEntryVir[indiceDiretorio] & PTE_U) && temPosicaoUtilizada(pageTabEntryVir)) {
+          // condicional verifica:
+              // se os flags P (Present) e U (User) estão acionados
+              // se para aquele índice, isto é, para aquela Page Table, se ela possui posições sendo utilizadas
+        cprintf("      pdir P %d, %p: \n", indiceDiretorio, ppn);   // imprime o índice do diretório e qual a sua PPN
+        //cprintf("          Memory location of page table = %p\n", pageTabEntryFis); // imprime o endereço físico da Page Table em questão
+        cprintf("        End. fisico do inicio da Page Table apontada pelo diretorio %d = %p\n", indiceDiretorio, pageTabEntryFis); 
+
+        // Impressões referentes a Page Table que é apontada pela entrada atual da Page Directory
+        for (int indicePagina = 0; indicePagina < NPTENTRIES; indicePagina++) {   // percorre todas as páginas da Page Table!!
+          if ((pageTabEntryVir[indicePagina] & PTE_P) && (pageTabEntryVir[indicePagina] & PTE_U)) {   // confere se a dita página está sendo usada
+            cprintf("              ptbl PTE %d", indicePagina);     // começa a impressão: primeiro imprime o índice da página em questão
+            cprintf(", %p", (PTE_ADDR(pageTabEntryVir[indicePagina]) >> 12));   // shift right de 12; assim os últimos 12 bits são "eliminados" (eram os flags)
+                                                                                // e só resta a informação que queremos imprimir: o PPN
+            cprintf(", %p\n", PTE_ADDR(pageTabEntryVir[indicePagina]));         // imprime o endereço virtual inteiro
+          }
+        }
+      }
+
+    }
+
+    // inicio da impressão dos Page Mappings
+    cprintf("Page mappings: \n");
+
+    for (int indiceDiretorio = 0; indiceDiretorio < NPDENTRIES; indiceDiretorio++) {   // loop para percorrer todos as entradas da Page Directory
+      pageTabEntryFis = (pte_t*)PTE_ADDR(pageDirEntryVir[indiceDiretorio]);   // coleta o endereço virtual armazenado naquela entrada do Page Directory
+      pageTabEntryVir = P2V(pageTabEntryFis);   // converete o endereço físico armazenado na pageTabEntryFis em virtual
+      vpn = (pte_t*)(PTE_ADDR(pageTabEntryVir) >> 12);   // armazena o virtual page number coletando os últimos 12 bits do endereço virtual
+      ppn = (pte_t*)((int)pageTabEntryFis >> 12);                    // armazena o phisical page number coletando os últimos 12 bits do endereço físico
+
+      if ((pageDirEntryVir[indiceDiretorio] & PTE_P) && (pageDirEntryVir[indiceDiretorio] & PTE_U) && temPosicaoUtilizada(pageTabEntryVir)) {
+        cprintf("    [ memoria virtual: %x ] -> [ memoria fisica: %x ]\n", vpn, ppn);
+      }
+    }
   }
 }
