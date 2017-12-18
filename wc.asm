@@ -173,7 +173,7 @@ wc(int fd, char *name)
   while((n = read(fd, buf, sizeof(buf))) > 0){
   c0:	83 ec 04             	sub    $0x4,%esp
   c3:	68 00 02 00 00       	push   $0x200
-  c8:	68 80 0b 00 00       	push   $0xb80
+  c8:	68 80 1b 00 00       	push   $0x1b80
   cd:	ff 75 08             	pushl  0x8(%ebp)
   d0:	e8 05 03 00 00       	call   3da <read>
   d5:	83 c4 10             	add    $0x10,%esp
@@ -201,7 +201,7 @@ wc(int fd, char *name)
   f0:	74 3a                	je     12c <wc+0x8c>
       c++;
       if(buf[i] == '\n')
-  f2:	0f be 87 80 0b 00 00 	movsbl 0xb80(%edi),%eax
+  f2:	0f be 87 80 1b 00 00 	movsbl 0x1b80(%edi),%eax
         l++;
   f9:	31 c9                	xor    %ecx,%ecx
   fb:	3c 0a                	cmp    $0xa,%al
@@ -1413,7 +1413,7 @@ free(void *ap)
 
   bp = (Header*)ap - 1;
   for(p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
- 6b1:	a1 60 0b 00 00       	mov    0xb60,%eax
+ 6b1:	a1 60 1b 00 00       	mov    0x1b60,%eax
 static Header base;
 static Header *freep;
 
@@ -1498,7 +1498,7 @@ free(void *ap)
     p->s.ptr = bp;
  707:	89 08                	mov    %ecx,(%eax)
   freep = p;
- 709:	a3 60 0b 00 00       	mov    %eax,0xb60
+ 709:	a3 60 1b 00 00       	mov    %eax,0x1b60
 }
  70e:	5b                   	pop    %ebx
  70f:	5e                   	pop    %esi
@@ -1530,7 +1530,7 @@ free(void *ap)
   } else
     p->s.ptr = bp;
   freep = p;
- 72d:	a3 60 0b 00 00       	mov    %eax,0xb60
+ 72d:	a3 60 1b 00 00       	mov    %eax,0x1b60
     bp->s.size += p->s.ptr->s.size;
     bp->s.ptr = p->s.ptr->s.ptr;
   } else
@@ -1571,7 +1571,7 @@ malloc(uint nbytes)
   nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
  749:	8b 45 08             	mov    0x8(%ebp),%eax
   if((prevp = freep) == 0){
- 74c:	8b 15 60 0b 00 00    	mov    0xb60,%edx
+ 74c:	8b 15 60 1b 00 00    	mov    0x1b60,%edx
 malloc(uint nbytes)
 {
   Header *p, *prevp;
@@ -1619,7 +1619,7 @@ malloc(uint nbytes)
       return (void*)(p + 1);
     }
     if(p == freep)
- 7a1:	39 05 60 0b 00 00    	cmp    %eax,0xb60
+ 7a1:	39 05 60 1b 00 00    	cmp    %eax,0x1b60
  7a7:	89 c2                	mov    %eax,%edx
  7a9:	75 ed                	jne    798 <malloc+0x58>
   char *p;
@@ -1645,7 +1645,7 @@ malloc(uint nbytes)
  7c5:	50                   	push   %eax
  7c6:	e8 e5 fe ff ff       	call   6b0 <free>
   return freep;
- 7cb:	8b 15 60 0b 00 00    	mov    0xb60,%edx
+ 7cb:	8b 15 60 1b 00 00    	mov    0x1b60,%edx
       }
       freep = prevp;
       return (void*)(p + 1);
@@ -1678,7 +1678,7 @@ malloc(uint nbytes)
  7ec:	89 78 04             	mov    %edi,0x4(%eax)
       }
       freep = prevp;
- 7ef:	89 15 60 0b 00 00    	mov    %edx,0xb60
+ 7ef:	89 15 60 1b 00 00    	mov    %edx,0x1b60
       return (void*)(p + 1);
  7f5:	83 c0 08             	add    $0x8,%eax
     }
@@ -1708,12 +1708,12 @@ malloc(uint nbytes)
   nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
   if((prevp = freep) == 0){
     base.s.ptr = freep = prevp = &base;
- 806:	c7 05 60 0b 00 00 64 	movl   $0xb64,0xb60
- 80d:	0b 00 00 
- 810:	c7 05 64 0b 00 00 64 	movl   $0xb64,0xb64
- 817:	0b 00 00 
+ 806:	c7 05 60 1b 00 00 64 	movl   $0x1b64,0x1b60
+ 80d:	1b 00 00 
+ 810:	c7 05 64 1b 00 00 64 	movl   $0x1b64,0x1b64
+ 817:	1b 00 00 
     base.s.size = 0;
- 81a:	b8 64 0b 00 00       	mov    $0xb64,%eax
- 81f:	c7 05 68 0b 00 00 00 	movl   $0x0,0xb68
+ 81a:	b8 64 1b 00 00       	mov    $0x1b64,%eax
+ 81f:	c7 05 68 1b 00 00 00 	movl   $0x0,0x1b68
  826:	00 00 00 
  829:	e9 3e ff ff ff       	jmp    76c <malloc+0x2c>

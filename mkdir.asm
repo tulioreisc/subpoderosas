@@ -1207,7 +1207,7 @@ free(void *ap)
 
   bp = (Header*)ap - 1;
   for(p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
- 5b1:	a1 10 0a 00 00       	mov    0xa10,%eax
+ 5b1:	a1 10 1a 00 00       	mov    0x1a10,%eax
 static Header base;
 static Header *freep;
 
@@ -1292,7 +1292,7 @@ free(void *ap)
     p->s.ptr = bp;
  607:	89 08                	mov    %ecx,(%eax)
   freep = p;
- 609:	a3 10 0a 00 00       	mov    %eax,0xa10
+ 609:	a3 10 1a 00 00       	mov    %eax,0x1a10
 }
  60e:	5b                   	pop    %ebx
  60f:	5e                   	pop    %esi
@@ -1324,7 +1324,7 @@ free(void *ap)
   } else
     p->s.ptr = bp;
   freep = p;
- 62d:	a3 10 0a 00 00       	mov    %eax,0xa10
+ 62d:	a3 10 1a 00 00       	mov    %eax,0x1a10
     bp->s.size += p->s.ptr->s.size;
     bp->s.ptr = p->s.ptr->s.ptr;
   } else
@@ -1365,7 +1365,7 @@ malloc(uint nbytes)
   nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
  649:	8b 45 08             	mov    0x8(%ebp),%eax
   if((prevp = freep) == 0){
- 64c:	8b 15 10 0a 00 00    	mov    0xa10,%edx
+ 64c:	8b 15 10 1a 00 00    	mov    0x1a10,%edx
 malloc(uint nbytes)
 {
   Header *p, *prevp;
@@ -1413,7 +1413,7 @@ malloc(uint nbytes)
       return (void*)(p + 1);
     }
     if(p == freep)
- 6a1:	39 05 10 0a 00 00    	cmp    %eax,0xa10
+ 6a1:	39 05 10 1a 00 00    	cmp    %eax,0x1a10
  6a7:	89 c2                	mov    %eax,%edx
  6a9:	75 ed                	jne    698 <malloc+0x58>
   char *p;
@@ -1439,7 +1439,7 @@ malloc(uint nbytes)
  6c5:	50                   	push   %eax
  6c6:	e8 e5 fe ff ff       	call   5b0 <free>
   return freep;
- 6cb:	8b 15 10 0a 00 00    	mov    0xa10,%edx
+ 6cb:	8b 15 10 1a 00 00    	mov    0x1a10,%edx
       }
       freep = prevp;
       return (void*)(p + 1);
@@ -1472,7 +1472,7 @@ malloc(uint nbytes)
  6ec:	89 78 04             	mov    %edi,0x4(%eax)
       }
       freep = prevp;
- 6ef:	89 15 10 0a 00 00    	mov    %edx,0xa10
+ 6ef:	89 15 10 1a 00 00    	mov    %edx,0x1a10
       return (void*)(p + 1);
  6f5:	83 c0 08             	add    $0x8,%eax
     }
@@ -1502,12 +1502,12 @@ malloc(uint nbytes)
   nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
   if((prevp = freep) == 0){
     base.s.ptr = freep = prevp = &base;
- 706:	c7 05 10 0a 00 00 14 	movl   $0xa14,0xa10
- 70d:	0a 00 00 
- 710:	c7 05 14 0a 00 00 14 	movl   $0xa14,0xa14
- 717:	0a 00 00 
+ 706:	c7 05 10 1a 00 00 14 	movl   $0x1a14,0x1a10
+ 70d:	1a 00 00 
+ 710:	c7 05 14 1a 00 00 14 	movl   $0x1a14,0x1a14
+ 717:	1a 00 00 
     base.s.size = 0;
- 71a:	b8 14 0a 00 00       	mov    $0xa14,%eax
- 71f:	c7 05 18 0a 00 00 00 	movl   $0x0,0xa18
+ 71a:	b8 14 1a 00 00       	mov    $0x1a14,%eax
+ 71f:	c7 05 18 1a 00 00 00 	movl   $0x0,0x1a18
  726:	00 00 00 
  729:	e9 3e ff ff ff       	jmp    66c <malloc+0x2c>
