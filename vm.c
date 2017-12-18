@@ -312,9 +312,7 @@ clearpteu(pde_t *pgdir, char *uva)
 
 // Given a parent process's page table, create a copy
 // of it for a child.
-pde_t*
-copyuvm(pde_t *pgdir, uint sz)
-{
+pde_t* copyuvm(pde_t *pgdir, uint sz) {
   pde_t *d;
   pte_t *pte;
   uint pa, i, flags;
@@ -322,9 +320,15 @@ copyuvm(pde_t *pgdir, uint sz)
 
   if((d = setupkvm()) == 0)
     return 0;
-  for(i = 0; i < sz; i += PGSIZE){
+  //for(i = 0; i < sz; i += PGSIZE) {
+  for(i = PGSIZE; i < sz; i += PGSIZE) {
+    // dentro deste loop ocorre o procedimento de cópia, página por página, do conteúdo do processo pai 
+    // para o processo filho. Porém, na versão original isso é feito desde a primeira página - que agora 
+    // está vazia. A nova "primeira página" é a segunda página, e esse loop deve refletir isso. 
+      //Para isso, o ponto de início da repetição foi trocado para o começo da segunda página, que é o 
+      // fim da primeira página, ou seja, o tamanho de uma página, que está na constante PGSIZE.
     if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
-      panic("copyuvm: pte should exist");
+      panic("copyuvm: pte should exist");  
     if(!(*pte & PTE_P))
       panic("copyuvm: page not present");
     pa = PTE_ADDR(*pte);

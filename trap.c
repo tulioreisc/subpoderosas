@@ -86,13 +86,26 @@ trap(struct trapframe *tf)
               tf->trapno, cpuid(), tf->eip, rcr2());
       panic("trap");
     }
+    // [...]
     // In user space, assume process misbehaved.
     cprintf("pid %d %s: trap %d err %d on cpu %d "
             "eip 0x%x addr 0x%x--kill proc\n",
             myproc()->pid, myproc()->name, tf->trapno,
             tf->err, cpuid(), tf->eip, rcr2());
+    // essa condicional foi adicionada para tornar a leitura do erro mais representativa
+    // a função rcr2 está definida no arquivo x86.h
+        // rcr2 retorna o conteúdo do registrador cr2, que é o que armazena o endereço que tentou-se acessar no caso de um Page Fault
+        // quer-se esse valor porque se ele for 0, quer dizer que usuário está tentando acessar a página 0 - que queremos bloquear
+        // tf é passado como parâmetro para essa função (que é de tratamento de traps), é do tipo trapframe (definido no arquivo x86.h), 
+        // e trapno é um de seus atributos. Em trapno está armazenado o número (código) da trap em ocorrência, que nesse caso é 14
+    // a condicional então é ativada somente quando tenta-se acessar a página 0 de um processo e uma trap do tipo certo (14) é chamada 
+    if (rcr2() == 0 && tf->trapno == 14) {
+            cprintf("Voce esta tentando acessar a pagina 0 de um processo!\nProcedimento nao permitido!\n");
+    }
+
     myproc()->killed = 1;
   }
+  // [...]
 
   // Force process exit if it has been killed and is in user space.
   // (If it is still executing in the kernel, let it keep running
