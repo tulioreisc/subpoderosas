@@ -50,7 +50,7 @@ main(void)
   // Read and run input commands.
   while(getcmd(buf, sizeof(buf)) >= 0){
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
-    1040:	80 3d 42 28 00 00 20 	cmpb   $0x20,0x2842
+    1040:	80 3d 42 38 00 00 20 	cmpb   $0x20,0x3842
     1047:	74 5d                	je     10a6 <main+0xa6>
     1049:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
 int
@@ -82,15 +82,15 @@ fork1(void)
   while(getcmd(buf, sizeof(buf)) >= 0){
     1067:	83 ec 08             	sub    $0x8,%esp
     106a:	6a 64                	push   $0x64
-    106c:	68 40 28 00 00       	push   $0x2840
+    106c:	68 40 38 00 00       	push   $0x3840
     1071:	e8 9a 00 00 00       	call   1110 <getcmd>
     1076:	83 c4 10             	add    $0x10,%esp
     1079:	85 c0                	test   %eax,%eax
     107b:	78 78                	js     10f5 <main+0xf5>
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
-    107d:	80 3d 40 28 00 00 63 	cmpb   $0x63,0x2840
+    107d:	80 3d 40 38 00 00 63 	cmpb   $0x63,0x3840
     1084:	75 ca                	jne    1050 <main+0x50>
-    1086:	80 3d 41 28 00 00 64 	cmpb   $0x64,0x2841
+    1086:	80 3d 41 38 00 00 64 	cmpb   $0x64,0x3841
     108d:	74 b1                	je     1040 <main+0x40>
 int
 fork1(void)
@@ -113,17 +113,17 @@ fork1(void)
       // Chdir must be called by the parent, not the child.
       buf[strlen(buf)-1] = 0;  // chop \n
     10a6:	83 ec 0c             	sub    $0xc,%esp
-    10a9:	68 40 28 00 00       	push   $0x2840
+    10a9:	68 40 38 00 00       	push   $0x3840
     10ae:	e8 ad 0a 00 00       	call   1b60 <strlen>
       if(chdir(buf+3) < 0)
-    10b3:	c7 04 24 43 28 00 00 	movl   $0x2843,(%esp)
+    10b3:	c7 04 24 43 38 00 00 	movl   $0x3843,(%esp)
 
   // Read and run input commands.
   while(getcmd(buf, sizeof(buf)) >= 0){
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
       // Chdir must be called by the parent, not the child.
       buf[strlen(buf)-1] = 0;  // chop \n
-    10ba:	c6 80 3f 28 00 00 00 	movb   $0x0,0x283f(%eax)
+    10ba:	c6 80 3f 38 00 00 00 	movb   $0x0,0x383f(%eax)
       if(chdir(buf+3) < 0)
     10c1:	e8 cc 0c 00 00       	call   1d92 <chdir>
     10c6:	83 c4 10             	add    $0x10,%esp
@@ -131,7 +131,7 @@ fork1(void)
     10cb:	79 9a                	jns    1067 <main+0x67>
         printf(2, "cannot cd %s\n", buf+3);
     10cd:	50                   	push   %eax
-    10ce:	68 43 28 00 00       	push   $0x2843
+    10ce:	68 43 38 00 00       	push   $0x3843
     10d3:	68 39 22 00 00       	push   $0x2239
     10d8:	6a 02                	push   $0x2
     10da:	e8 91 0d 00 00       	call   1e70 <printf>
@@ -163,7 +163,7 @@ fork1(void)
     if(fork1() == 0)
       runcmd(parsecmd(buf));
     10fa:	83 ec 0c             	sub    $0xc,%esp
-    10fd:	68 40 28 00 00       	push   $0x2840
+    10fd:	68 40 38 00 00       	push   $0x3840
     1102:	e8 69 09 00 00       	call   1a70 <parsecmd>
     1107:	89 04 24             	mov    %eax,(%esp)
     110a:	e8 71 00 00 00       	call   1180 <runcmd>
@@ -852,7 +852,7 @@ gettoken(char **ps, char *es, char **q, char **eq)
     14ab:	0f be 07             	movsbl (%edi),%eax
     14ae:	83 ec 08             	sub    $0x8,%esp
     14b1:	50                   	push   %eax
-    14b2:	68 38 28 00 00       	push   $0x2838
+    14b2:	68 38 38 00 00       	push   $0x3838
     14b7:	e8 f4 06 00 00       	call   1bb0 <strchr>
     14bc:	83 c4 10             	add    $0x10,%esp
     14bf:	85 c0                	test   %eax,%eax
@@ -905,7 +905,7 @@ gettoken(char **ps, char *es, char **q, char **eq)
     14ff:	0f be 07             	movsbl (%edi),%eax
     1502:	83 ec 08             	sub    $0x8,%esp
     1505:	50                   	push   %eax
-    1506:	68 38 28 00 00       	push   $0x2838
+    1506:	68 38 38 00 00       	push   $0x3838
     150b:	e8 a0 06 00 00       	call   1bb0 <strchr>
     1510:	83 c4 10             	add    $0x10,%esp
     1513:	85 c0                	test   %eax,%eax
@@ -971,7 +971,7 @@ gettoken(char **ps, char *es, char **q, char **eq)
     1550:	0f be 07             	movsbl (%edi),%eax
     1553:	83 ec 08             	sub    $0x8,%esp
     1556:	50                   	push   %eax
-    1557:	68 30 28 00 00       	push   $0x2830
+    1557:	68 30 38 00 00       	push   $0x3830
     155c:	e8 4f 06 00 00       	call   1bb0 <strchr>
     1561:	83 c4 10             	add    $0x10,%esp
     1564:	85 c0                	test   %eax,%eax
@@ -989,7 +989,7 @@ gettoken(char **ps, char *es, char **q, char **eq)
     156f:	0f be 07             	movsbl (%edi),%eax
     1572:	83 ec 08             	sub    $0x8,%esp
     1575:	50                   	push   %eax
-    1576:	68 38 28 00 00       	push   $0x2838
+    1576:	68 38 38 00 00       	push   $0x3838
     157b:	e8 30 06 00 00       	call   1bb0 <strchr>
     1580:	83 c4 10             	add    $0x10,%esp
     1583:	85 c0                	test   %eax,%eax
@@ -1107,7 +1107,7 @@ peek(char **ps, char *es, char *toks)
     1617:	0f be 03             	movsbl (%ebx),%eax
     161a:	83 ec 08             	sub    $0x8,%esp
     161d:	50                   	push   %eax
-    161e:	68 38 28 00 00       	push   $0x2838
+    161e:	68 38 38 00 00       	push   $0x3838
     1623:	e8 88 05 00 00       	call   1bb0 <strchr>
     1628:	83 c4 10             	add    $0x10,%esp
     162b:	85 c0                	test   %eax,%eax
@@ -3098,7 +3098,7 @@ free(void *ap)
 
   bp = (Header*)ap - 1;
   for(p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
-    2011:	a1 a4 28 00 00       	mov    0x28a4,%eax
+    2011:	a1 a4 38 00 00       	mov    0x38a4,%eax
 static Header base;
 static Header *freep;
 
@@ -3183,7 +3183,7 @@ free(void *ap)
     p->s.ptr = bp;
     2067:	89 08                	mov    %ecx,(%eax)
   freep = p;
-    2069:	a3 a4 28 00 00       	mov    %eax,0x28a4
+    2069:	a3 a4 38 00 00       	mov    %eax,0x38a4
 }
     206e:	5b                   	pop    %ebx
     206f:	5e                   	pop    %esi
@@ -3215,7 +3215,7 @@ free(void *ap)
   } else
     p->s.ptr = bp;
   freep = p;
-    208d:	a3 a4 28 00 00       	mov    %eax,0x28a4
+    208d:	a3 a4 38 00 00       	mov    %eax,0x38a4
     bp->s.size += p->s.ptr->s.size;
     bp->s.ptr = p->s.ptr->s.ptr;
   } else
@@ -3256,7 +3256,7 @@ malloc(uint nbytes)
   nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
     20a9:	8b 45 08             	mov    0x8(%ebp),%eax
   if((prevp = freep) == 0){
-    20ac:	8b 15 a4 28 00 00    	mov    0x28a4,%edx
+    20ac:	8b 15 a4 38 00 00    	mov    0x38a4,%edx
 malloc(uint nbytes)
 {
   Header *p, *prevp;
@@ -3304,7 +3304,7 @@ malloc(uint nbytes)
       return (void*)(p + 1);
     }
     if(p == freep)
-    2101:	39 05 a4 28 00 00    	cmp    %eax,0x28a4
+    2101:	39 05 a4 38 00 00    	cmp    %eax,0x38a4
     2107:	89 c2                	mov    %eax,%edx
     2109:	75 ed                	jne    20f8 <malloc+0x58>
   char *p;
@@ -3330,7 +3330,7 @@ malloc(uint nbytes)
     2125:	50                   	push   %eax
     2126:	e8 e5 fe ff ff       	call   2010 <free>
   return freep;
-    212b:	8b 15 a4 28 00 00    	mov    0x28a4,%edx
+    212b:	8b 15 a4 38 00 00    	mov    0x38a4,%edx
       }
       freep = prevp;
       return (void*)(p + 1);
@@ -3363,7 +3363,7 @@ malloc(uint nbytes)
     214c:	89 78 04             	mov    %edi,0x4(%eax)
       }
       freep = prevp;
-    214f:	89 15 a4 28 00 00    	mov    %edx,0x28a4
+    214f:	89 15 a4 38 00 00    	mov    %edx,0x38a4
       return (void*)(p + 1);
     2155:	83 c0 08             	add    $0x8,%eax
     }
@@ -3393,12 +3393,12 @@ malloc(uint nbytes)
   nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
   if((prevp = freep) == 0){
     base.s.ptr = freep = prevp = &base;
-    2166:	c7 05 a4 28 00 00 a8 	movl   $0x28a8,0x28a4
-    216d:	28 00 00 
-    2170:	c7 05 a8 28 00 00 a8 	movl   $0x28a8,0x28a8
-    2177:	28 00 00 
+    2166:	c7 05 a4 38 00 00 a8 	movl   $0x38a8,0x38a4
+    216d:	38 00 00 
+    2170:	c7 05 a8 38 00 00 a8 	movl   $0x38a8,0x38a8
+    2177:	38 00 00 
     base.s.size = 0;
-    217a:	b8 a8 28 00 00       	mov    $0x28a8,%eax
-    217f:	c7 05 ac 28 00 00 00 	movl   $0x0,0x28ac
+    217a:	b8 a8 38 00 00       	mov    $0x38a8,%eax
+    217f:	c7 05 ac 38 00 00 00 	movl   $0x0,0x38ac
     2186:	00 00 00 
     2189:	e9 3e ff ff ff       	jmp    20cc <malloc+0x2c>

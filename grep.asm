@@ -477,7 +477,7 @@ grep(char *pattern, int fd)
     1240:	83 ec 04             	sub    $0x4,%esp
     1243:	29 c8                	sub    %ecx,%eax
     1245:	50                   	push   %eax
-    1246:	8d 81 c0 1d 00 00    	lea    0x1dc0(%ecx),%eax
+    1246:	8d 81 20 20 00 00    	lea    0x2020(%ecx),%eax
     124c:	50                   	push   %eax
     124d:	ff 75 0c             	pushl  0xc(%ebp)
     1250:	e8 25 03 00 00       	call   157a <read>
@@ -488,7 +488,7 @@ grep(char *pattern, int fd)
     1260:	01 45 e4             	add    %eax,-0x1c(%ebp)
     buf[m] = '\0';
     p = buf;
-    1263:	bb c0 1d 00 00       	mov    $0x1dc0,%ebx
+    1263:	bb 20 20 00 00       	mov    $0x2020,%ebx
   int n, m;
   char *p, *q;
 
@@ -497,7 +497,7 @@ grep(char *pattern, int fd)
     m += n;
     1268:	8b 55 e4             	mov    -0x1c(%ebp),%edx
     buf[m] = '\0';
-    126b:	c6 82 c0 1d 00 00 00 	movb   $0x0,0x1dc0(%edx)
+    126b:	c6 82 20 20 00 00 00 	movb   $0x0,0x2020(%edx)
     1272:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
     p = buf;
     while((q = strchr(p, '\n')) != 0){
@@ -548,7 +548,7 @@ grep(char *pattern, int fd)
       p = q+1;
     }
     if(p == buf)
-    12c8:	81 fb c0 1d 00 00    	cmp    $0x1dc0,%ebx
+    12c8:	81 fb 20 20 00 00    	cmp    $0x2020,%ebx
     12ce:	74 30                	je     1300 <grep+0xe0>
       m = 0;
     if(m > 0){
@@ -565,13 +565,13 @@ grep(char *pattern, int fd)
       m = 0;
     if(m > 0){
       m -= p - buf;
-    12e0:	2d c0 1d 00 00       	sub    $0x1dc0,%eax
+    12e0:	2d 20 20 00 00       	sub    $0x2020,%eax
     12e5:	29 45 e4             	sub    %eax,-0x1c(%ebp)
     12e8:	8b 4d e4             	mov    -0x1c(%ebp),%ecx
       memmove(buf, p, m);
     12eb:	51                   	push   %ecx
     12ec:	53                   	push   %ebx
-    12ed:	68 c0 1d 00 00       	push   $0x1dc0
+    12ed:	68 20 20 00 00       	push   $0x2020
     12f2:	e8 39 02 00 00       	call   1530 <memmove>
     12f7:	83 c4 10             	add    $0x10,%esp
     12fa:	e9 39 ff ff ff       	jmp    1238 <grep+0x18>
@@ -1716,7 +1716,7 @@ free(void *ap)
 
   bp = (Header*)ap - 1;
   for(p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
-    1851:	a1 a0 1d 00 00       	mov    0x1da0,%eax
+    1851:	a1 00 20 00 00       	mov    0x2000,%eax
 static Header base;
 static Header *freep;
 
@@ -1801,7 +1801,7 @@ free(void *ap)
     p->s.ptr = bp;
     18a7:	89 08                	mov    %ecx,(%eax)
   freep = p;
-    18a9:	a3 a0 1d 00 00       	mov    %eax,0x1da0
+    18a9:	a3 00 20 00 00       	mov    %eax,0x2000
 }
     18ae:	5b                   	pop    %ebx
     18af:	5e                   	pop    %esi
@@ -1833,7 +1833,7 @@ free(void *ap)
   } else
     p->s.ptr = bp;
   freep = p;
-    18cd:	a3 a0 1d 00 00       	mov    %eax,0x1da0
+    18cd:	a3 00 20 00 00       	mov    %eax,0x2000
     bp->s.size += p->s.ptr->s.size;
     bp->s.ptr = p->s.ptr->s.ptr;
   } else
@@ -1874,7 +1874,7 @@ malloc(uint nbytes)
   nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
     18e9:	8b 45 08             	mov    0x8(%ebp),%eax
   if((prevp = freep) == 0){
-    18ec:	8b 15 a0 1d 00 00    	mov    0x1da0,%edx
+    18ec:	8b 15 00 20 00 00    	mov    0x2000,%edx
 malloc(uint nbytes)
 {
   Header *p, *prevp;
@@ -1922,7 +1922,7 @@ malloc(uint nbytes)
       return (void*)(p + 1);
     }
     if(p == freep)
-    1941:	39 05 a0 1d 00 00    	cmp    %eax,0x1da0
+    1941:	39 05 00 20 00 00    	cmp    %eax,0x2000
     1947:	89 c2                	mov    %eax,%edx
     1949:	75 ed                	jne    1938 <malloc+0x58>
   char *p;
@@ -1948,7 +1948,7 @@ malloc(uint nbytes)
     1965:	50                   	push   %eax
     1966:	e8 e5 fe ff ff       	call   1850 <free>
   return freep;
-    196b:	8b 15 a0 1d 00 00    	mov    0x1da0,%edx
+    196b:	8b 15 00 20 00 00    	mov    0x2000,%edx
       }
       freep = prevp;
       return (void*)(p + 1);
@@ -1981,7 +1981,7 @@ malloc(uint nbytes)
     198c:	89 78 04             	mov    %edi,0x4(%eax)
       }
       freep = prevp;
-    198f:	89 15 a0 1d 00 00    	mov    %edx,0x1da0
+    198f:	89 15 00 20 00 00    	mov    %edx,0x2000
       return (void*)(p + 1);
     1995:	83 c0 08             	add    $0x8,%eax
     }
@@ -2011,12 +2011,12 @@ malloc(uint nbytes)
   nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
   if((prevp = freep) == 0){
     base.s.ptr = freep = prevp = &base;
-    19a6:	c7 05 a0 1d 00 00 a4 	movl   $0x1da4,0x1da0
-    19ad:	1d 00 00 
-    19b0:	c7 05 a4 1d 00 00 a4 	movl   $0x1da4,0x1da4
-    19b7:	1d 00 00 
+    19a6:	c7 05 00 20 00 00 04 	movl   $0x2004,0x2000
+    19ad:	20 00 00 
+    19b0:	c7 05 04 20 00 00 04 	movl   $0x2004,0x2004
+    19b7:	20 00 00 
     base.s.size = 0;
-    19ba:	b8 a4 1d 00 00       	mov    $0x1da4,%eax
-    19bf:	c7 05 a8 1d 00 00 00 	movl   $0x0,0x1da8
+    19ba:	b8 04 20 00 00       	mov    $0x2004,%eax
+    19bf:	c7 05 08 20 00 00 00 	movl   $0x0,0x2008
     19c6:	00 00 00 
     19c9:	e9 3e ff ff ff       	jmp    190c <malloc+0x2c>

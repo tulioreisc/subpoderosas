@@ -127,7 +127,7 @@ fmtname(char *path)
     10a9:	83 c4 0c             	add    $0xc,%esp
     10ac:	50                   	push   %eax
     10ad:	53                   	push   %ebx
-    10ae:	68 50 1d 00 00       	push   $0x1d50
+    10ae:	68 50 2d 00 00       	push   $0x2d50
     10b3:	e8 98 04 00 00       	call   1550 <memmove>
   memset(buf+strlen(p), ' ', DIRSIZ-strlen(p));
     10b8:	89 1c 24             	mov    %ebx,(%esp)
@@ -135,7 +135,7 @@ fmtname(char *path)
     10c0:	89 1c 24             	mov    %ebx,(%esp)
     10c3:	89 c6                	mov    %eax,%esi
   return buf;
-    10c5:	bb 50 1d 00 00       	mov    $0x1d50,%ebx
+    10c5:	bb 50 2d 00 00       	mov    $0x2d50,%ebx
 
   // Return blank-padded name.
   if(strlen(p) >= DIRSIZ)
@@ -145,7 +145,7 @@ fmtname(char *path)
     10ca:	e8 f1 02 00 00       	call   13c0 <strlen>
     10cf:	ba 0e 00 00 00       	mov    $0xe,%edx
     10d4:	83 c4 0c             	add    $0xc,%esp
-    10d7:	05 50 1d 00 00       	add    $0x1d50,%eax
+    10d7:	05 50 2d 00 00       	add    $0x2d50,%eax
     10dc:	29 f2                	sub    %esi,%edx
     10de:	52                   	push   %edx
     10df:	6a 20                	push   $0x20
@@ -1551,7 +1551,7 @@ free(void *ap)
 
   bp = (Header*)ap - 1;
   for(p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
-    1871:	a1 60 1d 00 00       	mov    0x1d60,%eax
+    1871:	a1 60 2d 00 00       	mov    0x2d60,%eax
 static Header base;
 static Header *freep;
 
@@ -1636,7 +1636,7 @@ free(void *ap)
     p->s.ptr = bp;
     18c7:	89 08                	mov    %ecx,(%eax)
   freep = p;
-    18c9:	a3 60 1d 00 00       	mov    %eax,0x1d60
+    18c9:	a3 60 2d 00 00       	mov    %eax,0x2d60
 }
     18ce:	5b                   	pop    %ebx
     18cf:	5e                   	pop    %esi
@@ -1668,7 +1668,7 @@ free(void *ap)
   } else
     p->s.ptr = bp;
   freep = p;
-    18ed:	a3 60 1d 00 00       	mov    %eax,0x1d60
+    18ed:	a3 60 2d 00 00       	mov    %eax,0x2d60
     bp->s.size += p->s.ptr->s.size;
     bp->s.ptr = p->s.ptr->s.ptr;
   } else
@@ -1709,7 +1709,7 @@ malloc(uint nbytes)
   nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
     1909:	8b 45 08             	mov    0x8(%ebp),%eax
   if((prevp = freep) == 0){
-    190c:	8b 15 60 1d 00 00    	mov    0x1d60,%edx
+    190c:	8b 15 60 2d 00 00    	mov    0x2d60,%edx
 malloc(uint nbytes)
 {
   Header *p, *prevp;
@@ -1757,7 +1757,7 @@ malloc(uint nbytes)
       return (void*)(p + 1);
     }
     if(p == freep)
-    1961:	39 05 60 1d 00 00    	cmp    %eax,0x1d60
+    1961:	39 05 60 2d 00 00    	cmp    %eax,0x2d60
     1967:	89 c2                	mov    %eax,%edx
     1969:	75 ed                	jne    1958 <malloc+0x58>
   char *p;
@@ -1783,7 +1783,7 @@ malloc(uint nbytes)
     1985:	50                   	push   %eax
     1986:	e8 e5 fe ff ff       	call   1870 <free>
   return freep;
-    198b:	8b 15 60 1d 00 00    	mov    0x1d60,%edx
+    198b:	8b 15 60 2d 00 00    	mov    0x2d60,%edx
       }
       freep = prevp;
       return (void*)(p + 1);
@@ -1816,7 +1816,7 @@ malloc(uint nbytes)
     19ac:	89 78 04             	mov    %edi,0x4(%eax)
       }
       freep = prevp;
-    19af:	89 15 60 1d 00 00    	mov    %edx,0x1d60
+    19af:	89 15 60 2d 00 00    	mov    %edx,0x2d60
       return (void*)(p + 1);
     19b5:	83 c0 08             	add    $0x8,%eax
     }
@@ -1846,12 +1846,12 @@ malloc(uint nbytes)
   nunits = (nbytes + sizeof(Header) - 1)/sizeof(Header) + 1;
   if((prevp = freep) == 0){
     base.s.ptr = freep = prevp = &base;
-    19c6:	c7 05 60 1d 00 00 64 	movl   $0x1d64,0x1d60
-    19cd:	1d 00 00 
-    19d0:	c7 05 64 1d 00 00 64 	movl   $0x1d64,0x1d64
-    19d7:	1d 00 00 
+    19c6:	c7 05 60 2d 00 00 64 	movl   $0x2d64,0x2d60
+    19cd:	2d 00 00 
+    19d0:	c7 05 64 2d 00 00 64 	movl   $0x2d64,0x2d64
+    19d7:	2d 00 00 
     base.s.size = 0;
-    19da:	b8 64 1d 00 00       	mov    $0x1d64,%eax
-    19df:	c7 05 68 1d 00 00 00 	movl   $0x0,0x1d68
+    19da:	b8 64 2d 00 00       	mov    $0x2d64,%eax
+    19df:	c7 05 68 2d 00 00 00 	movl   $0x0,0x2d68
     19e6:	00 00 00 
     19e9:	e9 3e ff ff ff       	jmp    192c <malloc+0x2c>
