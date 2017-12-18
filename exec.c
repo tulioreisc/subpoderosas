@@ -7,9 +7,7 @@
 #include "x86.h"
 #include "elf.h"
 
-int
-exec(char *path, char **argv)
-{
+int exec(char *path, char **argv) {
   char *s, *last;
   int i, off;
   uint argc, sz, sp, ustack[3+MAXARG+1];
@@ -21,7 +19,7 @@ exec(char *path, char **argv)
 
   begin_op();
 
-  if((ip = namei(path)) == 0){
+  if((ip = namei(path)) == 0) {
     end_op();
     cprintf("exec: fail\n");
     return -1;
@@ -29,6 +27,7 @@ exec(char *path, char **argv)
   ilock(ip);
   pgdir = 0;
 
+  // [...]
   // Check ELF header
   if(readi(ip, (char*)&elf, 0, sizeof(elf)) != sizeof(elf))
     goto bad;
@@ -39,7 +38,14 @@ exec(char *path, char **argv)
     goto bad;
 
   // Load program into memory.
-  sz = 0;
+  // sz é o tamanho atual do espaço de memória alocado para o processo
+  // quando sz é inicializada em 0, significa que o processo pode começar a escrever seu conteúdo a partir do ponto 0
+  // não queremos isso, e por isso inicializamos seu valor em PGSIZE-1, que é um valor definido no mmu.h como 4096
+  //sz = 0;
+  sz = PGSIZE - 1;
+  // como PGSIZE é referente ao tamanho da página, colocar PGSIZE-1 significa iniciar a partir da segunda página
+  // ou seja, o processo vai ter sua primeira página vazia. 
+  
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, (char*)&ph, off, sizeof(ph)) != sizeof(ph))
       goto bad;
@@ -56,6 +62,8 @@ exec(char *path, char **argv)
     if(loaduvm(pgdir, (char*)ph.vaddr, ip, ph.off, ph.filesz) < 0)
       goto bad;
   }
+  // [...]
+
   iunlockput(ip);
   end_op();
   ip = 0;
