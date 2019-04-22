@@ -1,7 +1,7 @@
 TRABALHO DE SISTEMAS OPERACIONAIS 1 - 2017/2
 ============================================
 
-Prof. Dra. Kelen Vivaldini
+_Prof. Dra. Kelen Vivaldini_
 
 O intuito do trabalho foi realizar alterações na manipulação de memória do sistema xv6.
 
